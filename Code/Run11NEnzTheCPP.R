@@ -24,8 +24,8 @@
      setwd("..")
 ifelse( length(dir("/scratch/Infor")), setwd("/scratch/Infor"),setwd("/home/david/BioResearch/"))
 ifelse( length(dir("/scratch/Infor")), setwd("/scratch/Infor"),setwd("/home/david/BioResearch/"))
-ifelse( length(dir("/scratch/Infor")), sourceCpp(paste( getwd(),'/DFDC7GammaDelayGridMeanCV.cpp',sep = "")),sourceCpp(paste( getwd(),'/CPP/DFDC7GammaDelayGridMeanCV.cpp',sep = "")))
-ifelse( length(dir("/scratch/Infor")),   clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/DFDC7GammaDelayGridMeanCV.cpp',sep = ""))),  clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/CPP/DFDC7GammaDelayGridMeanCV.cpp',sep = ""))))
+ifelse( length(dir("/scratch/Infor")), sourceCpp(paste( getwd(),'/NEnz7GammaD.cpp',sep = "")),sourceCpp(paste( getwd(),'/CPP/NEnz7GammaD.cpp',sep = "")))
+ifelse( length(dir("/scratch/Infor")),   clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/NEnz7GammaD.cpp',sep = ""))),  clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/CPP/NEnz7GammaD.cpp',sep = ""))))
 
   # clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/DF7ParallelBernouli.cpp',sep = "")))
   #foreach(i = 1:length(sampleSize) , .noexport = c("MakeGamaFiles")) %dopar%{
@@ -49,7 +49,7 @@ ifelse( length(dir("/scratch/Infor")),   clusterEvalQ(cl2,Rcpp::sourceCpp(paste(
   addzz <- initialization[5]
   maxzz <- initialization[6]
 
-  clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/DFDC7GammaDelayGridMeanCV.cpp',sep = "")))
+  clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/NEnz7GammaD.cpp',sep = "")))
   # clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/DF7ParallelBernouli.cpp',sep = "")))
   #foreach(i = 1:length(sampleSize) , .noexport = c("MakeGamaFiles")) %dopar%{
 
@@ -133,7 +133,7 @@ yy<-1
 
 
         for(xx in 1:1){
-    for(yy in (0:16)){ 
+    for(yy in (0:15)){ 
      b<-tryCatch(unlink("/tmp/Infort/Gamma2",recursive = TRUE)) # prevents the files from being reused in multiple runs
      closeAllConnections()
  if ( length(dir("/scratch/Infor"))) {
@@ -155,7 +155,7 @@ yy<-1
 
   clusterEvalQ(cl2,setwd("/scratch/Infor"))
   
- clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/DFDC7GammaDelayGridMeanCV.cpp',sep = "")))
+ clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/NEnz7GammaD.cpp',sep = "")))
  }else{
    dir.create("/tmp/Infort/Gamma2", recursive=TRUE)
  setwd("~/")
@@ -181,7 +181,7 @@ yy<-1
   clusterEvalQ(cl2,setwd("/home/david/BioResearch/"))
   clusterEvalQ(cl2,library("Rcpp"))
   clusterEvalQ(cl2,library("Rcpp11"))
-   clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/CPP/DFDC7GammaDelayGridMeanCV.cpp',sep = "")))
+   clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/CPP/NEnz7GammaD.cpp',sep = "")))
  #clusterEvalQ(cl2,Rcpp::sourceCpp(paste( getwd(),'/DF7ParallelBernouli.cpp',sep = "")))
  }
 
@@ -212,7 +212,7 @@ yy<-1
 
        startVar<-.5+.5*yy
       # startzz <- .01+.25*xx
-  initialization <- c(startVar,2.5,startVar , .5 ,.1,.6) #test run
+  initialization <- c(startVar,2.5,startVar , .05 ,.05,.8) #test run formerly to .9
   # double startVar,  double  stepsize,   double maxVar,  double startzz,  double addzz, const double maxzz  )
 
     # double startMean Delay,  double  stepsize,   double maxMean Delay,  double start CV Delay,  double CV Delay, const double CV delay  )
@@ -223,11 +223,13 @@ yy<-1
 
  closeAllConnections()
  if (length(dir("/scratch/Infor"))) {
-source("/scratch/Infor/R16PeakToPeakf9,12.R")
+source("/scratch/Infor/R16PeakToPeak.R")
  }else{
  #setwd("/home/david/BioResearch/plotting")
-  source("/home/david/BioResearch/plotting/R16PeakToPeakf9,12.R")
- #source("/home/david/BioResearch/plotting/Time7SeriesPlotsSmooth.R")
+ # source("/home/david/BioResearch/plotting/TimeSeriesPlots5Short.R")
+ source("/home/david/BioResearch/plotting/R16PeakToPeak62.R")
+  source("/home/david/BioResearch/plotting/R16PeakToPeak32.R")
+ closeAllConnections()
 }
 
  closeAllConnections()
@@ -236,5 +238,5 @@ source("/scratch/Infor/R16PeakToPeakf9,12.R")
 
 }#endfor yy
 }#endfor xx
-#source("/home/david/BioResearch/plotting/summeryStats.R")
+source("/home/david/BioResearch/plotting/summeryStats2.R")
 
