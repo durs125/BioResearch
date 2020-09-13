@@ -7,7 +7,7 @@ pool2 = mp.Pool(safeProcessors)
 # Degrade and fire
 from  Functions_DegradeFire4 import *
 from  Classes_DegradeFire4 import *
-
+#Import after you start the multiprocess system
 import pandas as pd
 import os
 import math
@@ -15,9 +15,6 @@ import time
 from pathlib import Path
 import numpy as np
 
-#from numpy import random# this is not used
-
-#from  Functions_DegradeFire4 import gillespie_sim #this is not necessary, already imported
 mean_range = np.linspace(5, 10, 16)
 cv_range = np.linspace(0, .5, 16)
 alpha = 300
@@ -28,11 +25,10 @@ yr =80
 par_range = np.linspace(150, 600, 2)  # alpha
 param = 'alpha' #THE parameter
 
-#This loops over THE parameter in question to name the files according to which parameter value they have, an then loops over the delay values to run the simulation
+#This loops over THE parameter in question to first name the files according to which parameter value they have, an then loops over 
 for par in par_range:
     alpha = par #This shoud be the parameter
     path1 = 'PostProcessing/Simulations/{}{}'.format(param,par)
-    #path2 = 'Simulations/'+ param + str(par)
     Path(path1).mkdir(parents=True, exist_ok=True)
     
 #This generates and organizes meta data
@@ -43,8 +39,8 @@ for par in par_range:
         for cv in cv_range:
             file_name = path1+ '/mean=' + str(mu) + '_CV=' + str(cv)  + '.csv'
             row_of_file_names.append(file_name)
-        paths = path1 + '/1metadata.csv'
-        pd.DataFrame([row_of_file_names]).to_csv(paths,  mode='a', header=False, index=False)
+        pathFile = path1 + '/1metadata.csv'
+        pd.DataFrame([row_of_file_names]).to_csv(pathFile,  mode='a', header=False, index=False)
         row_of_file_names = []
    #This ends the metadata creation
     dilution = Reaction(np.array([-1], dtype=int), 0, 0, [0, beta, 1, 0], 1, [0])#np array used to allow expandability to multi species
