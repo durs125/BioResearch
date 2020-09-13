@@ -28,8 +28,8 @@ yr =80
 par_range = np.linspace(150, 600, 2)  # alpha
 param = 'alpha' #THE parameter
 
-
-for par in par_range:#This loops over THE parameter in question
+#This loops over THE parameter in question to name the files according to which parameter value they have
+for par in par_range:
     alpha = par #This shoud be the parameter
     path1 = 'PostProcessing/Simulations/{}{}'.format(param,par)
     #path2 = 'Simulations/'+ param + str(par)
@@ -37,7 +37,9 @@ for par in par_range:#This loops over THE parameter in question
     pd.DataFrame([mean_range]).to_csv(path1 + '/0metadata.csv', header=False, index=False)
     pd.DataFrame([cv_range]).to_csv(path1 + '/0metadata.csv', mode='a', header=False, index=False)
     row_of_file_names = []
+    #This loops over the delay mean, mu
     for mu in mean_range:
+        #Below loops over the Coeficient of varience of the delay time
         for cv in cv_range:
             file_name = path1+ '/mean=' + str(mu) + '_CV=' + str(cv)  + '.csv'
             row_of_file_names.append(file_name)
