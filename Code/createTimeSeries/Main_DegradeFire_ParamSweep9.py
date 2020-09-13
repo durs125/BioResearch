@@ -41,11 +41,11 @@ for par in par_range:
             row_of_file_names.append(file_name)
         pathFile = path1 + '/1metadata.csv'
         pd.DataFrame([row_of_file_names]).to_csv(pathFile,  mode='a', header=False, index=False)
-        row_of_file_names = []
+        row_of_file_names = [] # This includes the directory containing the files 
    #This ends the metadata creation
     dilution = Reaction(np.array([-1], dtype=int), 0, 0, [0, beta, 1, 0], 1, [0])#np array used to allow expandability to multi species
     enzymatic_degradation = Reaction(np.array([-1], dtype=int), 0, 0, [0, yr, R0, 1], 1, [0])
-    
+    #Loop over delay parameters only, mean and coeficient of varience (CV)
     for mu2 in mean_range:
       pool2.starmap(gillespie_sim, [(mu2, cv2,alpha,beta,R0 ,C0,yr,param,par,dilution,enzymatic_degradation) for cv2 in cv_range])
 
