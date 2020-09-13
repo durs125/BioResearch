@@ -26,11 +26,11 @@ R0 = 1
 C0 = 10
 yr =80
 par_range = np.linspace(150, 600, 2)  # alpha
-param = 'alpha'
+param = 'alpha' #THE parameter
 
 
-for par in par_range:
-    alpha = par
+for par in par_range:#This loops over THE parameter in question
+    alpha = par #This shoud be the parameter
     path1 = 'PostProcessing/Simulations/{}{}'.format(param,par)
     #path2 = 'Simulations/'+ param + str(par)
     Path(path1).mkdir(parents=True, exist_ok=True)
