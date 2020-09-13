@@ -50,12 +50,8 @@ for par in par_range:
     dilution = Reaction(np.array([-1], dtype=int), 0, 0, [0, beta, 1, 0], 1, [0])#np array used to allow expandability to multi species
     enzymatic_degradation = Reaction(np.array([-1], dtype=int), 0, 0, [0, yr, R0, 1], 1, [0])
     
-    cv =.5 # This is a debugging item
-    
     for mu2 in mean_range:
-        #for cv in cv_range:
-
-        pool2.starmap(gillespie_sim, [(mu2, cv2,alpha,beta,R0 ,C0,yr,param,par,dilution,enzymatic_degradation) for cv2 in cv_range])
+      pool2.starmap(gillespie_sim, [(mu2, cv2,alpha,beta,R0 ,C0,yr,param,par,dilution,enzymatic_degradation) for cv2 in cv_range])
 
 pool2.close()
 pool2.join()
