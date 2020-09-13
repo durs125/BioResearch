@@ -25,7 +25,7 @@ beta = .1
 R0 = 1
 C0 = 10
 yr =80
-par_range = np.linspace(.5, 2, 2)  # alpha
+par_range = np.linspace(150, 600, 2)  # alpha
 param = 'alpha'
 
 
