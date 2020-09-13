@@ -121,13 +121,17 @@ def dataframe_to_numpyarray(framed_data):
 #@jit #error pandas
 
 def gillespie_sim(mu, cv, alpha, beta, R0, C0, yr,param,par,dilution,enzymatic_degradation):
-
+#model parameters
     init_Protein = (alpha - yr) * ( mu - C0 * (math.sqrt(alpha / yr) - 1) / yr)   # calculate the avg peak to initialize at a peak
-    path1 = 'PostProcessing/Simulations/{}{}'.format(param,par)
     production = Classy.Reaction(np.array([1], dtype=int), 0, 1, [alpha, C0, 2], 0, [mu, mu * cv])
-    time_series = gillespie(np.array([production, enzymatic_degradation, dilution]), 600,
-                                np.array([init_Protein, 0], dtype=int))
-    #file_name =  path1+ '/mean=' + str(mu) + '_CV=' + str(cv) + '.csv'
+    timeRun = 4000
+#Naming files and paths
+    path1 = 'PostProcessing/Simulations/{}{}'.format(param,par)
     file_name =   '{}/mean={}_CV={}.csv'.format(path1,mu,cv)
+
+#Gillespie 
+    time_series = gillespie(np.array([production, enzymatic_degradation, dilution]), timeRun,
+                                np.array([init_Protein, 0], dtype=int))
+
     pd.DataFrame(time_series).to_csv(file_name, header=False, index=False)
-    pass
+    return file_name
