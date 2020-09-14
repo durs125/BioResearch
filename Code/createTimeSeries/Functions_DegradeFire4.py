@@ -28,7 +28,7 @@ def gillespie(reactions_list, stop_time, initial_state_vector):
         processing_time = next_reaction.distribution()
         if processing_time == 0:
             state_vector = state_vector + next_reaction.change_vec
-            time_series = write_to_time_series(time_series, current_time, state_vector)
+            time_series = update_time_series(time_series, current_time, state_vector)
         else:
             add_reaction(service_queue, current_time + processing_time, next_reaction)
     return dataframe_to_numpyarray(time_series)
