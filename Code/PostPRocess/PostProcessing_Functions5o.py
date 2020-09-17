@@ -8,11 +8,12 @@ import pandas as pd
 import scipy.special
 import numpy as np
 def cleanStatsHeatMap(directory2,file_names, mean_axis,cv_axis):
-    with open(directory2 + file_names[mean_axis, cv_axis]) as file:
-        length = max(len(list(csv.reader(file))),300000)
+
+    length = max(len(list(open(directory2 + file_names[mean_axis, cv_axis]))),400000)
+    lookAheadRollAvg = max(int(length*.00001),1)
     t1 = time.time()
     stats = Fun.all_together_now(np.genfromtxt(file_names[mean_axis, cv_axis], delimiter=','),
-                                 int(length*.02), 100, binomialCoeffSum( n))
+                                 int(length*.02), 100, binomialCoeffSum(lookAheadRollAvg))
     heat_map_matrices[:, mean_axis, cv_axis] = stats
     pass
 
