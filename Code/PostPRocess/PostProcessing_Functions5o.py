@@ -9,8 +9,8 @@ import scipy.special
 import numpy as np
 def cleanStatsHeatMap(directory2,file_names, mean_axis,cv_axis):
 
-    length = max(len(list(open(directory2 + file_names[mean_axis, cv_axis]))),400000)
-    lookAheadRollAvg = max(int(length*.00001),1)
+    length = max(len(list(open(directory2 + file_names[mean_axis, cv_axis]))),100000)
+    lookAheadRollAvg = max(int(length*.00004),1)
     t1 = time.time()
     stats = Fun.all_together_now(np.genfromtxt(file_names[mean_axis, cv_axis], delimiter=','),
                                  int(length*.02), 100, binomialCoeffSum(lookAheadRollAvg))
