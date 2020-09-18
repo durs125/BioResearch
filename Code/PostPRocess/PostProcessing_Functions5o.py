@@ -3,44 +3,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sb
 import pandas as pd
-
-
 import scipy.special
-import numpy as np
+
 def cleanStatsHeatMap(directory2,file_names, mean_axis,cv_axis):
 
     length = max(len(list(open(directory2 + file_names[mean_axis, cv_axis]))),100000)
     lookAheadRollAvg = max(int(length*.00004),1)
-    t1 = time.time()
-    stats = Fun.all_together_now(np.genfromtxt(file_names[mean_axis, cv_axis], delimiter=','),
-                                 int(length*.02), 100, binomialCoeffSum(lookAheadRollAvg))
+
+    stats = all_together_now(np.genfromtxt(file_names[mean_axis, cv_axis], delimiter=','),
+                                 int(length*.03), 100, makeBinomialVector(lookAheadRollAvg))
     heat_map_matrices[:, mean_axis, cv_axis] = stats
     pass
 
-def binomialCoeffSum( n): 
-        C = [[0]*(n+2) for i in range(0,n+2)] 
-     
+def binomialCoeffSum( n):
+        C = [[0]*(n+2) for i in range(0,n+2)]
+
         # Calculate value of Binomial  
         # Coefficient in bottom up manner 
-        for i in range(0,n+1): 
-            for j in range(0, min(i, n)+1): 
-              
+        for i in range(0,n+1):
+            for j in range(0, min(i, n)+1):
+
                 # Base Cases 
-                if (j == 0 or j == i): 
+                if (j == 0 or j == i):
                     C[i][j] = 1
                 # Calculate value using previously 
                 # stored values 
-                else: 
-                    C[i][j] = C[i - 1][j - 1] + C[i - 1][j] 
-       
+                else:
+                    C[i][j] = C[i - 1][j - 1] + C[i - 1][j]
+
         # Calculating the sum. 
         sums = 0
-        for i in range(0,n+1): 
-            sums += C[n][i] 
-       
+        for i in range(0,n+1):
+            sums += C[n][i]
+
         return sums
-def makeBinomial(points_ahead):
- 
+
+def makeBinomialVector(points_ahead):
+ # weighted average is based on binomial weights
     binomVector = np.zeros(2*points_ahead+1)
     for ixz in range(2*points_ahead+1):
         binomVector[ixz] =scipy.special.binom(2*points_ahead,ixz)/binomialCoeffSum(2*points_ahead)
