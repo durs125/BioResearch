@@ -4,7 +4,7 @@ import pandas as pd
 import math
 from pathlib import Path
 from numpy import random
-#from numba import jit, types, typed, float64, float32
+
 
 
 ''' main Distributed Delay Stochastic Simulation Algorithm 
@@ -26,7 +26,7 @@ def gillespie(reactions_list, stop_time, initial_state_vector):
         current_time = next_event_time
         next_reaction = choose_reaction(cumulative_propensities, reactions_list)
         processing_time = next_reaction.distribution()
-        if processing_time == 0:
+        if processing_time == 1:
             state_vector = state_vector + next_reaction.change_vec
             time_series = update_time_series(time_series, current_time, state_vector)
         else:
@@ -71,8 +71,8 @@ def draw_next_event_time(current_time, cumulative_propensities):
 
 #@jit error list
 def choose_reaction(cumulative_propensities, reactions_list):
-    u = float32(np.random.uniform())
-    next_reaction_index = min(np.where(float32(cumulative_propensities) > float32(cumulative_propensities[-1]) * u)[0])
+    u = np.float32(np.random.uniform())
+    next_reaction_index = min(np.where(np.float32(cumulative_propensities) >np.float32(cumulative_propensities[-1]) * u)[0])
     return reactions_list[next_reaction_index]
 
 
@@ -129,7 +129,7 @@ def gillespie_sim(mu, cv, alpha, beta, R0, C0, yr,param,par,dilution,enzymatic_d
 
 #Gillespie 
     time_series = gillespie(np.array([production, enzymatic_degradation, dilution]), timeRun,
-                                np.array([init_Protein, 0], dtype=int))
+                                np.array([init_Protein], dtype=int))
 
     pd.DataFrame(time_series).to_csv(file_name, header=False, index=False)
     return file_name
