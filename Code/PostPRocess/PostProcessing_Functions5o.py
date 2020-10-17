@@ -57,11 +57,16 @@ def burn_in_time_series(signal, burn_in_time):
     return burned_in_signal
 
 
-def uniformly_sample(signal, freq):
-    n = min(np.shape(signal))
-    end = signal[np.shape(signal)[0]-1,0]
-    
-    number_of_samples = int( end*freq )
+def uniformly_sample(signal, freq=0, number_of_samples = 0 ):
+    if freq > 0:
+        n = min(np.shape(signal))
+        end = signal[np.shape(signal)[0]-1,0]
+        number_of_samples = int( end*freq )
+    elif freq < 0 || number_samples < 1:
+        raise ValueError(("No samples specified or no sampling rate specified")
+        throw
+        
+        
     uniform_sampling = np.zeros([number_of_samples, n])
     uniform_timestamps = np.linspace(0, signal[-1, 0], number_of_samples)
     uniform_sampling[:, 0] = uniform_timestamps
@@ -138,12 +143,12 @@ def run_statistics(peaks):
     return [mean_period, mean_amplitude, period_coefficient_of_variation, amplitude_coefficient_of_variation]
 
 
-def all_together_now(signal, freq, burn_in_time, weights):
+def all_together_now(signal, freq, burn_in_time, weights, *number_of_samples):
     print('cleaning signal')
 
     clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,
                                                                         burn_in_time),
-                                                    freq),
+                                                    freq, number_of_samples),
                                    weights)
     return run_statistics(detect_peaks(clean_signal))
 
