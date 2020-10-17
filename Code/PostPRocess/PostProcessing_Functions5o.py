@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import matplotlib.pyplot as plt
+
 import seaborn as sb
 import pandas as pd
 import scipy.special
@@ -56,8 +57,11 @@ def burn_in_time_series(signal, burn_in_time):
     return burned_in_signal
 
 
-def uniformly_sample(signal, number_of_samples):
+def uniformly_sample(signal, freq):
     n = min(np.shape(signal))
+    end = signal[np.shape(signal)[0]-1,0]
+    
+    number_of_samples = int( end*freq )
     uniform_sampling = np.zeros([number_of_samples, n])
     uniform_timestamps = np.linspace(0, signal[-1, 0], number_of_samples)
     uniform_sampling[:, 0] = uniform_timestamps
@@ -134,19 +138,19 @@ def run_statistics(peaks):
     return [mean_period, mean_amplitude, period_coefficient_of_variation, amplitude_coefficient_of_variation]
 
 
-def all_together_now(signal, number_of_samples, burn_in_time, weights):
+def all_together_now(signal, freq, burn_in_time, weights):
     print('cleaning signal')
 
     clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,
                                                                         burn_in_time),
-                                                    number_of_samples),
+                                                    freq),
                                    weights)
     return run_statistics(detect_peaks(clean_signal))
 
 
 
-def clean_signal(signal,  number_of_samples, burn_in_time, weights):
-    clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,     burn_in_time), number_of_samples), weights)
+def clean_signal(signal,  freq, burn_in_time, weights):
+    clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,     burn_in_time), freq), weights)
 
     return clean_signal
 
