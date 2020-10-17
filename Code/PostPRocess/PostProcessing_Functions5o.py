@@ -62,8 +62,8 @@ def uniformly_sample(signal, freq=0, number_of_samples = 0 ):
         n = min(np.shape(signal))
         end = signal[np.shape(signal)[0]-1,0]
         number_of_samples = int( end*freq )
-    elif freq < 0 or number_samples < 1:
-        raise ValueError(("No samples specified or no sampling rate specified")     
+    elif freq < 0 or number_of_samples < 1:
+        raise ValueError(("No samples specified or no sampling rate specified") )
         
     uniform_sampling = np.zeros([number_of_samples, n])
     uniform_timestamps = np.linspace(0, signal[-1, 0], number_of_samples)
