@@ -1,51 +1,11 @@
 #!/usr/bin/env python
 import numpy as np
 import matplotlib.pyplot as plt
-
 import seaborn as sb
 import pandas as pd
-import scipy.special
-
-def cleanStatsHeatMap(directory2,file_names, mean_axis,cv_axis):
-
-    length = max(len(list(open(directory2 + file_names[mean_axis, cv_axis]))),100000)
-    lookAheadRollAvg = max(int(length*.00004),1)
-
-    stats = all_together_now(np.genfromtxt(file_names[mean_axis, cv_axis], delimiter=','),
-                                 int(length*.03), 100, makeBinomialVector(lookAheadRollAvg))
-    heat_map_matrices[:, mean_axis, cv_axis] = stats
-    pass
-
-def binomialCoeffSum( n):
-        C = [[0]*(n+2) for i in range(0,n+2)]
-
-        # Calculate value of Binomial  
-        # Coefficient in bottom up manner 
-        for i in range(0,n+1):
-            for j in range(0, min(i, n)+1):
-
-                # Base Cases 
-                if (j == 0 or j == i):
-                    C[i][j] = 1
-                # Calculate value using previously 
-                # stored values 
-                else:
-                    C[i][j] = C[i - 1][j - 1] + C[i - 1][j]
-
-        # Calculating the sum. 
-        sums = 0
-        for i in range(0,n+1):
-            sums += C[n][i]
-
-        return sums
-
-def makeBinomialVector(points_ahead):
- # weighted average is based on binomial weights
-    binomVector = np.zeros(2*points_ahead+1)
-    for ixz in range(2*points_ahead+1):
-        binomVector[ixz] =scipy.special.binom(2*points_ahead,ixz)/binomialCoeffSum(2*points_ahead)
-    return(binomVector)
-
+import math
+import scipy
+from scipy import signal
 def burn_in_time_series(signal, burn_in_time):
     temp_signal = signal
     temp_signal[:, 0] = signal[:, 0] - burn_in_time
@@ -55,6 +15,8 @@ def burn_in_time_series(signal, burn_in_time):
     temp_signal[new_start_time - 1, :] = new_start_state
     burned_in_signal = temp_signal[(new_start_time - 1):, :]
     return burned_in_signal
+
+
 
 def uniformly_sample(signal, freq=0, number_of_samples = 0 ):
     if freq > 0:
@@ -67,7 +29,7 @@ def uniformly_sample(signal, freq=0, number_of_samples = 0 ):
         freq = signal[-1, 0]/number_of_samples
 
     uniform_sampling = np.zeros([number_of_samples, n])
-    uniform_timestamps = np.linspace(0, freq*number_of_samples, number_of_samples)
+    uniform_timestamps = np.linspace(0, end, number_of_samples)
     uniform_sampling[:, 0] = uniform_timestamps
     counter = 0
     for index in range(number_of_samples):
@@ -77,6 +39,7 @@ def uniformly_sample(signal, freq=0, number_of_samples = 0 ):
                 break
             counter += 1
     return uniform_sampling
+
 
 def low_pass_filter(signal, weights):
     if len(weights) % 2 == 1:
@@ -88,9 +51,9 @@ def low_pass_filter(signal, weights):
             filtered_signal[index, 1] = np.dot(weights, signal[index:(index+chop*2+1), 1])
         return filtered_signal
     else:
-        print("Don't make me do this shit.")
+        print("Don't make me do this.")
         return "error"
-
+	#[1/256, 1/32, 7/64, 7/32, 35/128, 7/32, 7/64, 1/32, 1/256]
 
 def is_max_in_window(signal, length_of_signal, window_size):
     def window_checker(index):
@@ -128,7 +91,9 @@ def detect_peaks(signal):
     peaks = peaks[0, :, :]  # I don't know why this is necessary but it is
     directory = "/home/david/BioResearch/python/PostProcessing/Simulations/beta0.2/plots/"
  
-    pd.DataFrame(np.transpose(peaks)).to_csv((directory + 'peaks8000.csv'), mode='a', header=False, index=False)
+    pd.DataFrame(np.transpose(peaks)).to_csv((directory + 'peaks2000s.csv'), mode='a', header=False, index=False)
+#pd.DataFrame(peaks).transpose().to_csv((directory + 'peaks2000s.csv'), mode='a', header=False, index=False)
+    print("One down")
     return peaks  # pick off the peaks with timestamps and return them in a numpy array
 
 
@@ -140,22 +105,111 @@ def run_statistics(peaks):
     period_coefficient_of_variation = np.std(np.diff(peaks[:, 0])) / mean_period
     return [mean_period, mean_amplitude, period_coefficient_of_variation, amplitude_coefficient_of_variation]
 
+'''
+def cbind2(az,bz):
+    azshape =  np.shape(az)
+    
+    bzshape =  len(bz)  
+    fullMon = np.zeros((max(max(azshape),bzshape),2))
+    fullMon[0:azshape[0],0] = az
+    fullMon[0:bzshape,1] = bz
+    return(fullMon)
+def cbind(az,bz):
+    azshape =  np.shape(az)
+    bzshape =  length(bz)  
+    fulCol = np.zero((max(azshape[0],bzshape),(azshape[1]+bzshape[1])))
+    fulCol[0:azshape[0],0:azshape[1]] #= azshape
+    fulCol[bzshape[0]:,bzshape[1]:] = bzshape
+    return(fulCol)'''
 
-def all_together_now(signal, freq, burn_in_time, weights, *number_of_samples):
+
+def binomialCoeffSum( n): 
+        
+        C = [[0]*(n+2) for i in range(0,n+2)] 
+        
+       
+        # Calculate value of Binomial  
+        # Coefficient in bottom up manner 
+        for i in range(0,n+1): 
+            for j in range(0, min(i, n)+1): 
+              
+                # Base Cases 
+                if (j == 0 or j == i): 
+                    C[i][j] = 1
+       
+                # Calculate value using previously 
+                # stored values 
+                else: 
+                    C[i][j] = C[i - 1][j - 1] + C[i - 1][j] 
+       
+        # Calculating the sum. 
+        sums = 0
+        for i in range(0,n+1): 
+            sums += C[n][i] 
+       
+        return sums
+def makeBinomial(freq1 = 1, freq2 = 1):
+    points_ahead = int(freq1/freq2)
+    binomVector = np.zeros(2*points_ahead+1)
+    bsum = binomialCoeffSum(2*points_ahead)
+    for ixz in range(2*points_ahead+1):
+        binomVector[ixz] =scipy.special.binom(2*points_ahead,ixz)/bsum
+    return(binomVector)
+#makeBinomial(2)
+
+
+def uniform_Coeff( freq1,freq2):# how much overlap?
+    n = 2*int(.3333333333*freq1/freq2)+1 
+
+    return np.repeat(1/n,n)
+
+
+
+
+def triang_Coeff( freq1,freq2):# how much overlap?
+    n = 2*int(.3333333333*freq1/freq2)+1
+
+    first = np.linspace(1,int(.3333333333*freq1/freq2)+1,int(.3333333333*freq1/freq2)+1)
+    last = np.linspace(int(.3333333333*freq1/freq2),1,int(.3333333333*freq1/freq2))
+    vecs = np.append(first, last,axis = 0)
+    sums = sum(first) +sum(last)
+    return vecs/sums
+
+def all_together_now(signal,  burn_in_time, freq1 = 0, number_of_samples1=0,freq2 = 0,  number_of_samples2=0):
+    weights = makeBinomial(freq1,freq2)
     print('cleaning signal')
 
-    clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,
-                                                                        burn_in_time),
-                                                    freq, number_of_samples),
-                                   weights)
-    return run_statistics(detect_peaks(clean_signal))
+
+
+    #boxcar = scipy.signal.firwin(sizefil,.5, window = "boxcar") does not work
+    if freq1 < freq2:
+        spare = freq1
+        freq1 = freq2
+        freq2 = spare
+    if number_of_samples1 < number_of_samples2:
+        spare = number_of_samples1
+        number_of_samples1 = number_of_samples2
+        number_of_samples2 = spare
+    uniformized = uniformly_sample(burn_in_time_series(signal, burn_in_time), freq= freq1, number_of_samples=number_of_samples1)
+    clean_signal = burn_in_time_series(low_pass_filter(uniformized, makeBinomial(freq1,freq2),
+    #clean_signal = uniformly_sample(scipy.signal.lfilter(boxcar,1, freq= freq1, number_of_samples=number_of_samples1)), freq = freq2, number_of_samples=number_of_samples2)
+# I need rto make this accesible to other people 
+#I need to make this work on more than one input column: do that with  looking at the maximum size of the array, filtering each, and merging the streams
+# see if column bind is still around somewhere
+    #merged = cbind(uniformized[,0], scipy.signal.lfilter(boxcar,1,uniformized[:,-1]))
+
+    #clean_signal = uniformly_sample(merged, freq = freq2, number_of_samples=number_of_samples2)
+#    return low_pass_filter( uniformized,makeBinomial(freq1,freq2))
+    #return makeBinomial(freq1,freq2)
+    return (clean_signal)
+  #  return run_statistics(detect_peaks(clean_signal))
 
 
 
-def clean_signal(signal,  freq, burn_in_time, weights):
-    clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,     burn_in_time), freq), weights)
+'''def clean_signal(signal,  freq,  number_of_samples=0,burn_in_time, weights):
+    clean_signal = low_pass_filter(uniformly_sample(burn_in_time_series(signal,     burn_in_time),freq=freq number_of_samples = number_of_samples), weights)
 
-    return clean_signal
+    return clean_signal'''
 
 
 def generate_heat_map(data, title, axis_labels, heat_center):
@@ -170,6 +224,10 @@ def generate_heat_map(data, title, axis_labels, heat_center):
 #   heat_map.get_figure().savefig(file_name)
     plt.show()
     return heat_map
+
+
+
+
 
 
 def plot_time_series_with_peaks(signal, burn_in_time, weights):
