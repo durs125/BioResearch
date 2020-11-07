@@ -56,71 +56,57 @@ def low_pass_filter(signal, weights):
 def is_max_in_window(signal, length_of_signal, window_size):
     def window_checker(index):
         if index <= window_size or index >= length_of_signal - window_size:
-            return np.float32(1 + np.random.uniform())
+            return 1 + np.random.uniform()
         elif signal[index, 1] < signal[index - window_size, 1] \
                 or signal[index, 1] < signal[index + window_size, 1]:
-            return np.float32(1 + np.random.uniform())
+            return 1 + np.random.uniform()
         else:
-            return np.float32(0)
+            return 0
     return window_checker
 
 
 
 
 def compute_optimal_time_window_WhileLoop(signal, splits_matrix_into = 1):
-        #Split the matrix because it is a real memory hog and not all of it is needed, evaluate pice by pice
- # how many parts, more parts means more memory save but slow processing time, 
-#usualy can have a matirx of 2048 without a problem
-    """ first half of the peak detection algorithm """
-    if splits_matrix_into ==1 :
-        splits_matrix_into = 2+(np.shape(signal)[0] >>11) #this bit shifts to divide by 8192, then adds 2 avg 8192 rows per chunk
-        #need a min of 2 for the algorithm to work so add 2 in case the result is 0
-      
-
+    '''Split the matrix to evaluate in memory saving chunks.
+    Can usually split into 2048 pieces with no issue.'''
+    if splits_matrix_into == 1 :
+        splits_matrix_into = 2 + (np.shape(signal)[0] >> 11 )
     iterator = splits_matrix_into
-    nsample = max(np.shape(signal)) # number of samples, 
-
+    nsample = max(np.shape(signal))
     end_row = int(np.ceil(nsample / (2)) - 1)  
-    start_row = int(np.ceil((iterator -1 )*nsample / (2*splits_matrix_into)))    
-    lms = np.zeros([end_row - start_row,nsample  ],dtype = "float16")
-    '''print(iterator)
-    print(nsample)
-    print(end_row)
-    print(start_row)'''
-    #first run throug the for loop is needed before the while loop, more efficient than checking an if condition every time
-    for ixx in range(start_row, end_row): #make first chunk
-        lms[ixx-start_row, :] = np.float16(np.array(list(map(is_max_in_window(signal, (end_row-start_row), ixx + 1), range(nsample)))))
-        #end make bottom block
+    start_row = int(np.ceil((iterator - 1) * nsample / (2 * splits_matrix_into)))    
+    lms = np.zeros([end_row - start_row, nsample], dtype="float16")  #LMS = Local Maxima Scalogram
+    #more efficient to initialize the first chunk outside the loop
+    
+    #make first chunk
+    for index in range(start_row, end_row):
+        lms[index - start_row, :] = np.array(list(map(is_max_in_window(signal, (end_row-start_row),
+								       index + 1), range(nsample))))
+    #end make first chunk
 
     row_sum = np.sum(lms, axis=1)
-    #print(row_sum)
     gamma = np.where(row_sum == np.amin(row_sum))[0]
-
-    #print("rescaled lms")
-    previous_block = lms[0:(gamma[0] + 1), :]  # cut the lms at the optimal search window
+    previous_block = lms[0:(gamma[0] + 1), :]
     
-    iterator = iterator-1
-    while iterator >=1: #itterate over the pieces of the matrix
-
-        end_row = int(np.ceil(iterator*nsample / (2*splits_matrix_into)) )- 1  # 
-        start_row = int(np.ceil((iterator -1 )*nsample / (2*splits_matrix_into)))    
-  # everything is a peak until proven guilty, 
-#specify float16 for size,
-        size_combind = end_row - start_row +np.shape(previous_block)[0]
-        lms = np.zeros([end_row - start_row +np.shape(previous_block)[0], nsample  ],dtype = "float16")
-        for ixx in range( end_row-start_row):  #make subsequent block
-            lms[ixx, :] = np.float16(np.array( list(map(is_max_in_window(signal, (end_row-start_row), ixx + 1), range(nsample)))))
-            #end make subsequent block
-            
+    iterator -= 1
+    while iterator >= 1:
+        end_row = int(np.ceil(iterator * nsample / (2 * splits_matrix_into))) - 1
+        start_row = int(np.ceil((iterator - 1) * nsample / (2 * splits_matrix_into)))
+        size_combind = end_row - start_row + np.shape(previous_block)[0]
+        lms = np.zeros([end_row - start_row + np.shape(previous_block)[0], nsample], dtype="float16")
         
-        lms[range(end_row-start_row,size_combind),:] =previous_block # attach previous block
-        #print(row_sum)
+	#make subsequent block
+	for index in range(end_row - start_row):
+	    lms[index, :] = np.array(list(map(is_max_in_window(signal, (end_row-start_row), 
+							       index + 1), range(nsample))))
+        #end make subsequent block
+                
+        lms[range(end_row - start_row, size_combind), :] = previous_block  #attach previous block
         row_sum = np.sum(lms, axis=1)
         gamma = np.where(row_sum == np.amin(row_sum))[0]
         previous_block = lms[0:(gamma[0] + 1), :]  # cut the lms at the optimal search window
-        iterator = iterator - 1 
-        #print(rescaled_lms)
-  # end itterate over the pieces of the matrix
+        iterator -= 1
     return previous_block ##return value of the row sum to avoid duplication
 
 
@@ -128,34 +114,27 @@ def compute_optimal_time_window_WhileLoop(signal, splits_matrix_into = 1):
 
 def compute_optimal_time_window(signal, splits_matrix_into=8):
     """ first half of the peak detection algorithm """
-    n = max(np.shape(signal))  # number of samples
-    #print("n value")
-    #print(n)
-    #print("rows")
-    rows = int(np.ceil(n / 2) - 1)  # length of lms matrix
-    #print(rows)
-    lms = np.zeros((rows, n),dtype = "float16")  # everything is a peak until proven guilty
+    nsamples = max(np.shape(signal))  
+    rows = int(np.ceil(nsamples / 2) - 1)  
+    lms = np.zeros((rows, nsamples), dtype="float16")  #LMS = Local Maxima Scalogram
 
-    for x in range(0, rows):  # I wrote a function that creates a function to be called in another function for this...
+    for x in range(0, rows):
         lms[x, :] = np.array(list(map(is_max_in_window(signal, n, x + 1), range(n))))
     row_sum = np.sum(lms, axis=1)
     gamma = np.where(row_sum == np.amin(row_sum))
-    rescaled_lms = np.vsplit(lms, gamma[0] + 1)[0]  # cut the lms at the optimal search
+    rescaled_lms = np.vsplit(lms, gamma[0] + 1)[0]  # cut the lms at the optimal search window
     return rescaled_lms
 
 
 def detect_peaks(signal):
-    #print('detecting peaks')
-    column_sd = np.std(compute_optimal_time_window(signal), axis=0)
-    # where columns sum to zero is where local maxima occur
-    peaks_index = np.where(column_sd == 0)  # peaks occur when column-wise standard deviation is zero
-    peaks = signal[peaks_index, :]  # select peaks based on their index
+    column_sd = np.std(compute_optimal_time_window(signal), axis=0)  # where columns sum to zero is where local maxima occur
+    peaks_index = np.where(column_sd == 0)  
+    peaks = signal[peaks_index, :]
     peaks = peaks[0, :, :]  # I don't know why this is necessary but it is
-    return peaks  # pick off the peaks with timestamps and return them in a numpy array
+    return peaks
 
 
 def run_statistics(peaks):
-   # print('generating statistics')
     mean_amplitude = np.mean(peaks[:, 1])
     mean_period = np.mean(np.diff(peaks[:, 0]))
     amplitude_coefficient_of_variation = np.std(peaks[:, 1]) / mean_amplitude
