@@ -1,4 +1,4 @@
-import Classes_DegradeFire4 as Classy
+import Classes_Gillespie as Classy
 import numpy as np
 import pandas as pd
 import math

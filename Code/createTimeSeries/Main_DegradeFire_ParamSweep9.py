@@ -5,8 +5,8 @@ import multiprocessing as mp
 safeProcessors = max(1, mp.cpu_count() - 1)
 pool2 = mp.Pool(safeProcessors)
 # Degrade and fire
-from  Functions_DegradeFire4 import *
-from  Classes_DegradeFire4 import *
+from  Functions_Gillespie import *
+from  Classes_Gillespie import *
 #Import after you start the multiprocess system
 import pandas as pd
 import os
