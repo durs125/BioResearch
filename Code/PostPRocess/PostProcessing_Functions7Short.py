@@ -18,20 +18,18 @@ def burn_in_time_series(signal, burn_in_time):
 
 
 
-def uniformly_sample(signal, freq=0, number_of_samples = 0 ):
-    if freq > 0:
+def uniformly_sample(signal, rate = 0, number_of_samples = 0):
+    if rate > 0:
         n = min(np.shape(signal))
-        end = signal[np.shape(signal)[0]-1,0]
-        number_of_samples = int( end*freq )
-    elif freq < 0 or number_of_samples < 1:
+        end = signal[np.shape(signal)[0] - 1, 0]
+        number_of_samples = int( end / rate )
+    elif number_of_samples < 1:
         raise ValueError(("No samples specified or no sampling rate specified") ) 
-    else:
-        freq = signal[-1, 0]/number_of_samples
-
-    uniform_sampling = np.float32(np.zeros([number_of_samples, n]))
+    
+    uniform_sampling = np.zeros([number_of_samples, n], dtype="float32")
     uniform_timestamps = np.linspace(0, end, number_of_samples)
     uniform_sampling[:, 0] = uniform_timestamps
-    counter = 0
+    counter = int(0)
     for index in range(number_of_samples):
         while counter < max(np.shape(signal)):
             if signal[counter, 0] > uniform_timestamps[index]:
