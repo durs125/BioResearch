@@ -46,12 +46,11 @@ def low_pass_filter(signal, weights):
         weights = np.array(weights)
         for index in range(max(filtered_signal.shape)):
             filtered_signal[index, 0] = signal[index + chop, 0]
-            filtered_signal[index, 1] = np.dot(weights, signal[index:(index+chop*2+1), 1])
+            filtered_signal[index, 1] = np.dot(weights, signal[index:(index + chop * 2 + 1), 1])
         return filtered_signal
     else:
         print("Don't make me do this.")
         return "error"
-	#[1/256, 1/32, 7/64, 7/32, 35/128, 7/32, 7/64, 1/32, 1/256]
 
 def is_max_in_window(signal, length_of_signal, window_size):
     def window_checker(index):
@@ -159,15 +158,15 @@ def cbind(az,bz):#adds a column to an array
     return(fulCol)'''
 
 
-def binomialCoeffSum( n): 
+def binomialCoeffSum(n): 
         
-        C = [[0]*(n+2) for i in range(0,n+2)] 
+        C = [[0] * (n + 2) for i in range(0, n + 2)] 
         
        
         # Calculate value of Binomial  
         # Coefficient in bottom up manner 
-        for i in range(0,n+1): 
-            for j in range(0, min(i, n)+1): 
+        for i in range(0, n + 1): 
+            for j in range(0, min(i, n) + 1): 
               
                 # Base Cases 
                 if (j == 0 or j == i): 
@@ -180,44 +179,41 @@ def binomialCoeffSum( n):
        
         # Calculating the sum. 
         sums = 0
-        for i in range(0,n+1): 
+        for i in range(0, n + 1): 
             sums += C[n][i] 
        
         return sums
 
 def makeBinomial(freq1 = 1, freq2 = 1):
-    points_ahead = int(freq1/freq2)
-    binomVector = np.zeros(2*points_ahead+1)
-    bsum = binomialCoeffSum(2*points_ahead)
-    for ixz in range(2*points_ahead+1):
-        binomVector[ixz] =scipy.special.binom(2*points_ahead,ixz)/bsum
+    points_ahead = int(freq1 / freq2)
+    binomVector = np.zeros(2 * points_ahead + 1)
+    bsum = binomialCoeffSum(2 * points_ahead)
+    for index in range(2 * points_ahead + 1):
+        binomVector[index] = scipy.special.binom(2 * points_ahead, index) / bsum
     return(binomVector)
-#makeBinomial(2)
 
 
-def uniform_Coeff( freq1,freq2):# how much overlap?
-    n = 18*int(freq1/freq2)+1 
-
-    return np.repeat(1/n,n)
+def uniform_Coeff(freq1, freq2):# how much overlap?
+    n = 18 * int(freq1 / freq2) + 1 
+    return np.repeat(1 / n, n)
 
 
 
 
-def triang_Coeff( freq1,freq2):# how much overlap?
-    n = 4*int(freq1/freq2)+1
+def triang_Coeff(freq1, freq2):# how much overlap?
+    n = 4 * int(freq1 / freq2) + 1
 
-    first = np.linspace(1,2*int(freq1/freq2)+1,int(freq1/freq2)+1)
-    last = np.linspace(int(2*freq1/freq2),1,int(2*freq1/freq2))
-    vecs = np.append(first, last,axis = 0)
-    sums = sum(first) +sum(last)
-    return vecs/sums
+    first = np.linspace(1, 2 * int(freq1 / freq2) + 1, int(freq1 / freq2) + 1)
+    last = np.linspace(int(2 * freq1 / freq2), 1, int(2 * freq1 / freq2))
+    vecs = np.append(first, last, axis = 0)
+    sums = sum(first) + sum(last)
+    return vecs / sums
 
-def all_together_now_Binom(signal,  burn_in_time, freq1 = 0, number_of_samples1=0, freq2 = 1,  number_of_samples2 =0):
-    weights = makeBinomial(freq1,freq2)
-    #print('cleaning signal')
-    signal = 1000*np.random.rand(9,3)
-    bb = np.where(signal[:,0]<=600)
-    signal = signal[bb,:]
+def all_together_now_Binom(signal, burn_in_time, freq1 = 0, number_of_samples1 = 0, freq2 = 1, number_of_samples2 = 0):
+    weights = makeBinomial(freq1, freq2)
+    signal = 1000 * np.random.rand(9, 3)
+    bb = np.where(signal[:, 0] <= 600)
+    signal = signal[bb, :]
     print("Abriged Signal")
     if freq1 < freq2:
         spare = freq1
