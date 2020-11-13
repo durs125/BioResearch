@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 import numpy as np
 
-mean_range =np.array([7.5,0]) # np.linspace(5, 10, 16)
+mean_range =np.array([7.5, 0])
 cv_range = np.linspace(0, .5, 16)
 alpha = 300
 beta = .1
