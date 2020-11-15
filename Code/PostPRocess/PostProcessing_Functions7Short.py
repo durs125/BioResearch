@@ -380,20 +380,56 @@ def cleanStatsHeatMap(file_names, burn_in_time, rate1, weights = 0):
 
     if weights ==0:
         stats = all_together_now_Once(signal=np.genfromtxt(file_names, delimiter=','),burn_in_time = burn_in_time,  rate1 = rate1, )
+	
+        heat_map_matrices[:, 1, cv_axis] = stats
+        mean_period = pd.DataFrame(heat_map_matrices[0, :, :])
+        mean_amplitude = pd.DataFrame(heat_map_matrices[1, :, :])
+        period_CV = pd.DataFrame(heat_map_matrices[2, :, :])
+        amplitude_CV = pd.DataFrame(heat_map_matrices[3, :, :])
+        mean_period.to_csv(directory + 'Once_mean_period.csv', mode = "a")
+        mean_amplitude.to_csv(directory + 'Once_mean_amplitude.csv', mode = "a")
+        period_CV.to_csv(directory + 'Once_period_CV.csv', mode = "a")
+        amplitude_CV.to_csv(directory + 'Once_amplitude_CV.csv', mode = "a")
+    
     if weights ==1:
         stats = all_together_nowUni(signal=np.genfromtxt(file_names, delimiter=','),burn_in_time = burn_in_time,  rate1 = rate1, )
+        heat_map_matrices[:, 1, cv_axis] = stats
+        mean_period = pd.DataFrame(heat_map_matrices[0, :, :])
+        mean_amplitude = pd.DataFrame(heat_map_matrices[1, :, :])
+        period_CV = pd.DataFrame(heat_map_matrices[2, :, :])
+        amplitude_CV = pd.DataFrame(heat_map_matrices[3, :, :])
+        mean_period.to_csv(directory + 'Uni_mean_period.csv', mode = "a")
+        mean_amplitude.to_csv(directory + 'Uni_mean_amplitude.csv', mode = "a")
+        period_CV.to_csv(directory + 'Uni_period_CV.csv', mode = "a")
+        amplitude_CV.to_csv(directory + 'Uni_amplitude_CV.csv', mode = "a")
     if weights ==2:
         stats = Fun.all_together_now_Triang(signal=np.genfromtxt(file_names, delimiter=','),burn_in_time = burn_in_time, rate1 = rate1, )
+        heat_map_matrices[:, 1, cv_axis] = stats
+        mean_period = pd.DataFrame(heat_map_matrices[0, :, :])
+        mean_amplitude = pd.DataFrame(heat_map_matrices[1, :, :])
+        period_CV = pd.DataFrame(heat_map_matrices[2, :, :])
+        amplitude_CV = pd.DataFrame(heat_map_matrices[3, :, :])
+        mean_period.to_csv(directory + 'Tri_mean_period.csv', mode = "a")
+        mean_amplitude.to_csv(directory + 'Tri_mean_amplitude.csv', mode = "a")
+        period_CV.to_csv(directory + 'Tri_period_CV.csv', mode = "a")
+        amplitude_CV.to_csv(directory + 'Tri_amplitude_CV.csv', mode = "a")
     if weights ==3:
         stats = Fun.all_together_now_Binom(signal=np.genfromtxt(file_names, delimiter=','),burn_in_time = burn_in_time,  rate1 = rate1, )
+        heat_map_matrices[:, 1, cv_axis] = stats
+        mean_period = pd.DataFrame(heat_map_matrices[0, :, :])
+        mean_amplitude = pd.DataFrame(heat_map_matrices[1, :, :])
+        period_CV = pd.DataFrame(heat_map_matrices[2, :, :])
+        amplitude_CV = pd.DataFrame(heat_map_matrices[3, :, :])
+        mean_period.to_csv(directory + 'Binom_mean_period.csv', mode = "a")
+        mean_amplitude.to_csv(directory + 'Binom_mean_amplitude.csv', mode = "a")
+        period_CV.to_csv(directory + 'Binom_period_CV.csv', mode = "a")
+        amplitude_CV.to_csv(directory + 'Binom_amplitude_CV.csv', mode = "a")
 
 
-
-
-
-   #heat_map_matrices[:, mean_axis, cv_axis] = stats
+    heat_map_matrices[:, mean_axis, cv_axis] = stats
 
     pass
+
 
 
 
