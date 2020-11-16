@@ -21,7 +21,7 @@ def gillespie(reactions_list, stop_time, initial_state_vector):
         next_event_time = draw_next_event_time(current_time, cumulative_propensities)
         if reaction_will_complete(service_queue, next_event_time):
             [state_vector, current_time] = trigger_next_reaction(service_queue, state_vector)
-            update_time_series(time_series, current_time, state_vector)
+            time_series = update_time_series(time_series, current_time, state_vector) # made this an equal as opposed to a function call that retuned nothing
             continue
         current_time = next_event_time
         next_reaction = choose_reaction(cumulative_propensities, reactions_list)
@@ -100,10 +100,9 @@ def trigger_next_reaction(queue, state_vector):
     return [state_vector, current_time]
 
 def update_time_series(time_series, current_time, state_vector):
-    time_series.append(pd.DataFrame([[current_time, state_vector]],
-                                           columns=['time', 'state']), ignore_index=True)
-pass # we are not sure if it is memory efficient to hae this function or if it is better to reove the content of this function and move to where the function is called
-
+    return time_series.append(pd.DataFrame([[current_time, state_vector]],
+                                           columns=['time', 'state']), ignore_index=True) # DMI made this a retun not a pass
+ 
 ''' dataframe_to_numpyarray allows us to use the more efficient DataFrame class to record time series
     and then convert that object back into a usable numpy array. '''
 
